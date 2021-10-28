@@ -4,6 +4,8 @@ const deckOfCards = [];
 const dealer = [];
 const player = [];
 let playerStand = false;
+let playerBalance = 100;
+let betAmount = 0;
 
 const cardNum = [
   {
@@ -73,6 +75,16 @@ const hit = () => {
   check();
 };
 
+const placeBet = () => {
+  if (playerBalance > 0) {
+    console.clear();
+    console.log("Your Balance : ", playerBalance);
+    do {
+      betAmount = readlineSync.questionInt("Please place your bet :");
+    } while (betAmount < 0 || betAmount > playerBalance);
+  }
+};
+
 const stand = () => {
   playerStand = true;
   let score = dealer.reduce((acc, { value }) => (acc += value), 0);
@@ -88,6 +100,16 @@ const stand = () => {
 const checkWinner = () => {
   let playerScore = player.reduce((acc, { value }) => (acc += value), 0);
   let dealerScore = dealer.reduce((acc, { value }) => (acc += value), 0);
+
+  playerBalance =
+    dealerScore > 21
+      ? playerBalance + betAmount
+      : playerScore > dealerScore
+      ? playerBalance + betAmount
+      : playerScore === dealerScore
+      ? playerBalance
+      : playerBalance - betAmount;
+
   console.log(dealerScore);
   console.log(playerScore);
   console.log(
@@ -128,7 +150,7 @@ const showCurrentCards = () => {
   }
 
   console.log("=======");
-  console.log("Player");
+  console.log("Player, bet:", betAmount);
   for (i = 0; i < player.length; i++) {
     console.log(player[i].name, player[i].color);
   }
@@ -151,6 +173,7 @@ dealer.push(deckOfCards.pop());
 player.push(deckOfCards.pop());
 dealer.push(deckOfCards.pop());
 
+placeBet();
 showCurrentCards();
 
 if (
